@@ -165,6 +165,7 @@ struct State {
     light_buffer: wgpu::Buffer,
     light_bind_group: wgpu::BindGroup,
     light_render_pipeline: wgpu::RenderPipeline,
+    #[allow(dead_code)]
     debug_material: model::Material,
     mouse_pressed: bool,
     // NEW!
@@ -621,7 +622,6 @@ impl State {
             light_buffer,
             light_bind_group,
             light_render_pipeline,
-            #[allow(dead_code)]
             debug_material,
             mouse_pressed: false,
             // NEW!
@@ -811,7 +811,7 @@ pub async fn run() {
 
     let mut state = State::new(window).await.unwrap(); // NEW!
     let mut last_render_time = instant::Instant::now();
-    event_loop.run(move |event, elwt | {
+    let _ = event_loop.run(move |event, elwt | {
         match event {
             Event::DeviceEvent {
                 event: DeviceEvent::MouseMotion{ delta, },

@@ -1,58 +1,24 @@
 use std::io::{BufReader, Cursor};
 
-use cfg_if::cfg_if;
 use image::codecs::hdr::HdrDecoder;
 use wgpu::util::DeviceExt;
 
 use crate::{model, texture};
 
-#[cfg(target_arch = "wasm32")]
-fn format_url(file_name: &str) -> reqwest::Url {
-    let window = web_sys::window().unwrap();
-    let location = window.location();
-    let mut origin = location.origin().unwrap();
-    if !origin.ends_with("learn-wgpu") {
-        origin = format!("{}/learn-wgpu", origin);
-    }
-    let base = reqwest::Url::parse(&format!("{}/", origin,)).unwrap();
-    base.join(file_name).unwrap()
-}
-
 pub async fn load_string(file_name: &str) -> anyhow::Result<String> {
-    cfg_if! {
-        if #[cfg(target_arch = "wasm32")] {
-            let url = format_url(file_name);
-            let txt = reqwest::get(url)
-                .await?
-                .text()
-                .await?;
-        } else {
-            let path = std::path::Path::new(env!("OUT_DIR"))
-                .join("res")
-                .join(file_name);
-            let txt = std::fs::read_to_string(path)?;
-        }
-    }
+    let path = std::path::Path::new(env!("OUT_DIR"))
+        .join("res")
+        .join(file_name);
+    let txt = std::fs::read_to_string(path)?;
 
     Ok(txt)
 }
 
 pub async fn load_binary(file_name: &str) -> anyhow::Result<Vec<u8>> {
-    cfg_if! {
-        if #[cfg(target_arch = "wasm32")] {
-            let url = format_url(file_name);
-            let data = reqwest::get(url)
-                .await?
-                .bytes()
-                .await?
-                .to_vec();
-        } else {
-            let path = std::path::Path::new(env!("OUT_DIR"))
-                .join("res")
-                .join(file_name);
-            let data = std::fs::read(path)?;
-        }
-    }
+    let path = std::path::Path::new(env!("OUT_DIR"))
+        .join("res")
+        .join(file_name);
+    let data = std::fs::read(path)?;
 
     Ok(data)
 }
@@ -93,8 +59,10 @@ pub async fn load_model(
 
     let mut materials = Vec::new();
     for m in obj_materials? {
-        let diffuse_texture = load_texture(&m.diffuse_texture, false, device, queue).await?;
-        let normal_texture = load_texture(&m.normal_texture, true, device, queue).await?;
+        let diffuse_texture =
+            load_texture(m.diffuse_texture.as_deref().unwrap(), false, device, queue).await?;
+        let normal_texture =
+            load_texture(m.normal_texture.as_deref().unwrap(), true, device, queue).await?;
 
         materials.push(model::Material::new(
             device,
@@ -190,7 +158,7 @@ pub async fn load_model(
             // Average the tangents/bitangents
             for (i, n) in triangles_included.into_iter().enumerate() {
                 let denom = 1.0 / n as f32;
-                let mut v = &mut vertices[i];
+                let v = &mut vertices[i];
                 v.tangent = (cgmath::Vector3::from(v.tangent) * denom).into();
                 v.bitangent = (cgmath::Vector3::from(v.bitangent) * denom).into();
             }
@@ -327,8 +295,7 @@ impl HdrLoader {
             dst_size,
             self.texture_format,
             1,
-            wgpu::TextureUsages::STORAGE_BINDING
-                | wgpu::TextureUsages::TEXTURE_BINDING,
+            wgpu::TextureUsages::STORAGE_BINDING | wgpu::TextureUsages::TEXTURE_BINDING,
             wgpu::FilterMode::Nearest,
             label,
         );
@@ -356,7 +323,10 @@ impl HdrLoader {
         });
 
         let mut encoder = device.create_command_encoder(&Default::default());
-        let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor { label, timestamp_writes: None });
+        let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+            label,
+            timestamp_writes: None,
+        });
 
         let num_workgroups = (dst_size + 15) / 16;
         pass.set_pipeline(&self.equirect_to_cubemap);
