@@ -182,7 +182,6 @@ pub async fn run() {
                         } => elwt.exit(),
                         WindowEvent::Resized(physical_size) => {
                             state.resize(*physical_size);
-                            println!("resized: {:?}", physical_size);
                         }
                         _ => {}
                     }

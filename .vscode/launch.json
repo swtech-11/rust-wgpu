@@ -8,9 +8,12 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug executable",
+            "env": {
+                "RUST_LOG": "info"
+            },
             "cargo": {
                 "args": [
-                    "build",
+                    "run",
                     "--bin=rust-wgpu",
                     "--package=rust-wgpu"
                 ],
