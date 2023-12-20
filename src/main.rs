@@ -1,4 +1,4 @@
-use tutorial13_hdr::run;
+use rust_wgpu::run;
 
 fn main() {
     pollster::block_on(run());
