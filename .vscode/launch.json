@@ -13,73 +13,13 @@
             },
             "cargo": {
                 "args": [
-                    "run",
-                    "--bin=rust-wgpu",
-                    "--package=rust-wgpu"
-                ],
-                "filter": {
-                    "name": "rust-wgpu",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in library 'rust-wgpu'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--lib",
-                    "--package=rust-wgpu"
-                ],
-                "filter": {
-                    "name": "rust-wgpu",
-                    "kind": "lib"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug executable 'rust-wgpu'",
-            "cargo": {
-                "args": [
                     "build",
-                    "--bin=rust-wgpu",
-                    "--package=rust-wgpu"
+                    "-F",
+                    "debug"
                 ],
-                "filter": {
-                    "name": "rust-wgpu",
-                    "kind": "bin"
-                }
             },
             "args": [],
             "cwd": "${workspaceFolder}"
         },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'rust-wgpu'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=rust-wgpu",
-                    "--package=rust-wgpu"
-                ],
-                "filter": {
-                    "name": "rust-wgpu",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        }
     ]
 }
